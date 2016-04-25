@@ -37,3 +37,24 @@ services:
             - "@jms_translation.doc_parser"
         tags:
             - { name: jms_translation.file_visitor }
+
+    webtown_kunstmaan_extension.settings_menu_adaptor:
+        class: Webtown\KunstmaanExtensionBundle\Helper\Menu\SettingsMenuAdaptor
+        tags:
+            -  { name: 'kunstmaan_admin.menu.adaptor' }
+
+    webtown_kunstmaan_extension.cache_manager:
+        class: Webtown\KunstmaanExtensionBundle\HttpCache\Manager
+        arguments:
+            - "%kernel.cache_dir%"
+            - "@filesystem"
+            - "@?fos_http_cache.cache_manager"
+
+    webtown_kunstmaan_extension.cache_purge_subscriber:
+        class: Webtown\KunstmaanExtensionBundle\EventListener\CachePurgeSubscriber
+        lazy: true
+        arguments:
+            - "@webtown_kunstmaan_extension.cache_manager"
+            - "@?session"
+        tags:
+            - { name: doctrine.event_subscriber }

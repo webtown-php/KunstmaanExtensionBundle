@@ -1,5 +1,11 @@
 # WebtownKunstmaanExtensionBundle
 
+This bundle add new feature to KunstmaanCMSBundle:
+
+- Auto cache purge + cache purge page (Settings --> Cache purge)
+- JMSTranslateBundle integration (with a fork!)
+- Custom page parts: Gallery, InsertPage, Slider
+
 ## Install
 
 Step 1: Download the Bundle

@@ -1,0 +1,9 @@
+{% extends '@KunstmaanAdmin/Default/layout.html.twig' %}
+
+{% block content %}
+    <p>{{ 'kuma_admin.cache.info.raw'|trans()|raw }}</p>
+    <p>
+        <a href="{{ path('KunstmaanAdminBundle_cache_purge') }}" class="btn btn-primary btn--raise-on-hover"
+            ><i class="fa fa-fw fa-refresh"></i> {{ 'kuma_admin.cache.clear.label' |trans() }}</a>
+    </p>
+{% endblock %}
