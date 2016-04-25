@@ -4,13 +4,17 @@
     "description": "Kunstmaan extension bundle",
     "keywords": [
     ],
-    "homepage": "https://gitlab.webtown.hu/slaci/WebtownKunstmaanExtensionBundle",
+    "homepage": "https://github.com/webtown-php/KunstmaanExtensionBundle",
     "license": "proprietary",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": ":author_website",
+            "name": "Krisztián Ferenczi",
+            "email": "ferenczi.krisztian@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "László Somogyi",
+            "email": "somogyi.laszlo@webtown.hu",
             "role": "Developer"
         }
     ],
