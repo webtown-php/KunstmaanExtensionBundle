@@ -1,0 +1,39 @@
+parameters:
+    webtown_kunstmaan_extension.max_page_insertion_depth: 3
+
+services:
+    webtown_kunstmaan_extension.page_insert.twig.extension:
+        class: Webtown\KunstmaanExtensionBundle\Twig\Extension\PageInsertTwigExtension
+        arguments:
+            - "@doctrine"
+            - "@kunstmaan_pageparts.twig.extension"
+            - "%webtown_kunstmaan_extension.max_page_insertion_depth%"
+        tags:
+            - { name: twig.extension }
+
+    webtown_kunstmaan_extension.page_insert.admin_form_type:
+        class: Webtown\KunstmaanExtensionBundle\Form\PageParts\InsertPagePagePartAdminType
+        arguments:
+            - "@request_stack"
+            - "@doctrine"
+        tags:
+            - { name: form.type, alias: page_insert_page_part_type }
+
+    webtown_kunstmaan_extension.translation.kunstmaan_extractor:
+        class: Webtown\KunstmaanExtensionBundle\Translation\Extraction\File\KunstmaanExtractor
+        arguments:
+            - "@jms_translation.doc_parser"
+        tags:
+            - { name: jms_translation.file_visitor }
+
+    webtown_kunstmaan_extension.translation.kunstmaan_yml_extractor:
+        class: Webtown\KunstmaanExtensionBundle\Translation\Extraction\File\OriginalTranslationsYmlExtractor
+        tags:
+            - { name: jms_translation.file_visitor }
+
+    webtown_kunstmaan_extension.translation.menu_extractor:
+        class: Webtown\KunstmaanExtensionBundle\Translation\Extraction\File\MenuExtractor
+        arguments:
+            - "@jms_translation.doc_parser"
+        tags:
+            - { name: jms_translation.file_visitor }

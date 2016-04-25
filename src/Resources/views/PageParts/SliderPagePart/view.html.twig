@@ -1,0 +1,51 @@
+{##
+ # Bootstrap carousel
+ # @see https://getbootstrap.com/javascript/#carousel
+ #}
+{% set id = "carousel-" ~ resource.id %}
+<div id="{{ id }}" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        {% for i in 0..(resource.images|length - 1) %}
+            <li data-target="#{{ id }}" data-slide-to="{{ i }}" {% if loop.first %}class="active"{% endif %}></li>
+        {% endfor %}
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+        {% for image in resource.images %}
+            <div class="item {% if loop.first %}active{% endif %}">
+                <img src="{{ asset(image.media.url) }}" alt="{{ image.altText }}">
+                {% if image.caption or image.captionTitle or image.link %}
+                    <div class="carousel-caption">
+                        {% if image.captionTitle %}
+                            <h3>{{ image.captionTitle }}</h3>
+                        {% endif %}
+                        {% if image.caption %}
+                            <p>{{ image.caption }}</p>
+                        {% endif %}
+                        {% if image.link %}
+                            <p><a href="{{ image.link }}"{% if image.openInNewWindow %} target="_blank"{% endif %} class="btn btn-default">Tovább &raquo;</a></p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#{{ id }}" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">{{ 'slider.previous'
+            |trans()
+            |meaning('Slider "previous" controll button.')
+        }}</span>
+    </a>
+    <a class="right carousel-control" href="#{{ id }}" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">{{ 'slider.next'
+            |trans()
+            |meaning('Slider "next" controll button.')
+        }}</span>
+    </a>
+</div>

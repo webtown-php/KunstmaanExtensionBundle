@@ -1,0 +1,5 @@
+<div class="insert-page-pp">
+    {% if resource.node is not empty %}
+        {{ render_inserted_pageparts(resource, app.request.locale, true, 'main') }}
+    {% endif %}
+</div>
