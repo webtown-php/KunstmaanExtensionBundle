@@ -51,7 +51,11 @@ class PageInsertTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('render_inserted_pageparts', [$this, 'renderInsertedPageParts'], ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]),
+            new \Twig_SimpleFunction('render_inserted_pageparts', [$this, 'renderInsertedPageParts'], [
+                'needs_environment' => true,
+                'needs_context' => true,
+                'is_safe' => ['html']
+            ]),
             new \Twig_SimpleFunction('get_page_from_insert_page_page_part', [$this, 'getPageFromInsertPagePagePart']),
             new \Twig_SimpleFunction('get_page_by_internal_name', [$this, 'getPageByInternalName']),
         ];

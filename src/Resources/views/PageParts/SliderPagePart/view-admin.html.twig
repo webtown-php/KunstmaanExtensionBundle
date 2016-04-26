@@ -25,7 +25,10 @@
                                                         <p>{{ image.caption }}</p>
                                                     {% endif %}
                                                 {% if image.link %}
-                                                        <p><a href="{{ image.link }}"{% if image.openInNewWindow %} target="_blank"{% endif %} class="btn btn-default">Részletek</a></p>
+                                                        <p><a href="{{ image.link }}"{% if image.openInNewWindow %} target="_blank"{% endif %} class="btn btn-default">{{ 'wt_kuma_extension.slider.link.more'
+                                                            |trans()
+                                                            |meaning('Slider with link. This is the button label which follow the link.')
+                                                        }}</a></p>
                                                     {% endif %}
                                             </div>
                                     {% endif %}

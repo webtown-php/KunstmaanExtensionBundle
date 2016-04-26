@@ -33,7 +33,8 @@ class SliderPagePartAdminType extends AbstractType
         parent::buildForm($builder, $options);
 
         $builder->add('images', CollectionType::class, [
-            'type' => new SliderImageAdminType(),
+            'label'     => 'wt_kuma_extension.slider.form.label.images',
+            'type'      => new SliderImageAdminType(),
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,

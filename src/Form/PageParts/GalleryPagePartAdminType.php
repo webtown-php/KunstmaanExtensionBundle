@@ -30,10 +30,10 @@ class GalleryPagePartAdminType extends AbstractType
 
         $builder->add('folder', 'entity', [
             'required' => true,
-            'label' => 'Media könyvtár',
+            'label' => 'wt_kuma_extension.gallery.form.folder.label',
             'class' => 'KunstmaanMediaBundle:Folder',
             'attr' => ['class' => 'col-sm-8'],
-            'empty_value' => 'Válasszon könyvtárat',
+            'empty_value' => 'wt_kuma_extension.gallery.form.folder.empty_value',
             'property' => 'optionLabel',
             'multiple' => false,
             'expanded' => false,

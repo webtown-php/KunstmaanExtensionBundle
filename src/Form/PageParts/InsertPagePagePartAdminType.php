@@ -63,7 +63,8 @@ class InsertPagePagePartAdminType extends \Symfony\Component\Form\AbstractType
 
         parent::buildForm($builder, $options);
         $builder->add('node', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', [
-            'class' => 'Kunstmaan\NodeBundle\Entity\Node',
+            'label'    => 'wt_kuma_extension.insert_page.form.label.inserted_node',
+            'class'    => 'Kunstmaan\NodeBundle\Entity\Node',
             'expanded' => false,
             'multiple' => false,
             'required' => true,
