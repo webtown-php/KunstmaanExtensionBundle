@@ -55,7 +55,10 @@ class KunstmaanExtractor extends DefaultPhpFileExtractor
             'addFilter' => 2,
         ];
 
-        if (!$node instanceof Node\Expr\New_ && !$node instanceof Node\Expr\MethodCall) {
+        if (!$node instanceof Node\Expr\New_
+            && !$node instanceof Node\Expr\MethodCall
+            && !$node instanceof Node\Stmt\ClassMethod
+        ) {
             return;
         }
 
@@ -102,6 +105,62 @@ class KunstmaanExtractor extends DefaultPhpFileExtractor
 
             return;
         }
+        /**
+         * A getPossibleChildTypes() függvény válaszából gyűjti ki a Page neveket. Eg:
+         * <code>
+         *      public function getPossibleChildTypes()
+         *      {
+         *          return [
+         *              [
+         *                  'name'  => 'ContentPage', # <-- Ez kell nekünk
+         *                  'class' => 'BssOil\PublicBundle\Entity\Pages\ContentPage'
+         *              ],
+         *              [
+         *                  'name' => 'FormPage',
+         *                  'class' => 'BssOil\PublicBundle\Entity\Pages\FormPage'
+         *              ],
+         *              [
+         *                  'name' => 'ArticleListPage',
+         *                  'class' => 'BssOil\PublicBundle\Entity\Pages\ArticleListPage'
+         *              ],
+         *          ];
+         *      }
+         * </code>
+         */
+        if ($node instanceof Node\Stmt\ClassMethod
+            && is_string($node->name)
+            && $node->name == 'getPossibleChildTypes'
+        ) {
+            foreach ($node->getStmts() as $stmt) {
+                if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Node\Expr\Array_) {
+                    /** @var Node\Expr\Array_ $arrayNode */
+                    $arrayNode = $stmt->expr;
+                    /** @var Node\Expr\ArrayItem $arrayItem */
+                    foreach ($arrayNode->items as $arrayItem) {
+                        if ($arrayItem->value instanceof Node\Expr\Array_) {
+                            /** @var Node\Expr\ArrayItem $subArrayItem */
+                            foreach ($arrayItem->value->items as $subArrayItem) {
+                                if ($subArrayItem->key instanceof Node\Scalar\String_
+                                    && $subArrayItem->key->value == 'name'
+                                    && $subArrayItem->value instanceof Node\Scalar\String_
+                                ) {
+                                    $id = $subArrayItem->value->value;
+                                    $domain = self::DOMAIN;
+
+                                    $message = new Message($id, $domain);
+                                    $message->setDesc($desc);
+                                    $message->setMeaning($meaning);
+                                    $message->addSource(new FileSource((string) $this->file, $subArrayItem->getLine()));
+
+                                    $this->catalogue->add($message);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return;
     }
 
