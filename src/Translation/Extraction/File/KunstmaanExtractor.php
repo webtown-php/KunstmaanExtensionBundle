@@ -130,6 +130,8 @@ class KunstmaanExtractor extends DefaultPhpFileExtractor
         if ($node instanceof Node\Stmt\ClassMethod
             && is_string($node->name)
             && $node->name == 'getPossibleChildTypes'
+            // Interface esetén ez üres.
+            && $node->getStmts()
         ) {
             foreach ($node->getStmts() as $stmt) {
                 if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Node\Expr\Array_) {
