@@ -11,7 +11,7 @@ namespace Webtown\KunstmaanExtensionBundle\Configuration;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Elastica\Document;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Webtown\KunstmaanExtensionBundle\Entity\SearchableEntityInterface;
 use Webtown\KunstmaanExtensionBundle\Event\IndexEntityEvent;
 use Kunstmaan\AdminBundle\Helper\DomainConfigurationInterface;
@@ -41,7 +41,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
     /** @var Registry */
     protected $doctrine;
 
-    /** @var  EventDispatcher */
+    /** @var  EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var array|Document[] */
@@ -57,6 +57,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
      * @param DomainConfigurationInterface $domainConfiguration
      * @param $analyzerLanguages
      * @param Registry $doctrine
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         $name,
@@ -65,7 +66,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         DomainConfigurationInterface $domainConfiguration,
         $analyzerLanguages,
         Registry $doctrine,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->indexName           = $name;
         $this->indexType           = $type;
