@@ -63,7 +63,7 @@ services:
     webtown_kunstmaan_extension.search_subscriber:
         class: Webtown\KunstmaanExtensionBundle\EventListener\SearchSubscriber
         arguments:
-            - "@container_service"
+            - "@service_container"
         tags:
             - { name: doctrine.event_subscriber }
 
