@@ -125,6 +125,6 @@ class PageInsertTwigExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'page_insert';
+        return 'wt_kuma_extension.page_insert';
     }
 }

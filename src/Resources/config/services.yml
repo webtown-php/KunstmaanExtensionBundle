@@ -58,3 +58,32 @@ services:
             - "@?session"
         tags:
             - { name: doctrine.event_subscriber }
+
+    # Optimalizálás végett adjuk át a container-t!
+    webtown_kunstmaan_extension.search_subscriber:
+        class: Webtown\KunstmaanExtensionBundle\EventListener\SearchSubscriber
+        arguments:
+            - "@container_service"
+        tags:
+            - { name: doctrine.event_subscriber }
+
+    webtown_kunstmaan_extension.searchable_entity_configuration:
+        class: Webtown\KunstmaanExtensionBundle\Configuration\SearchableEntityConfiguration
+        lazy:  true
+        arguments:
+            - '%kunstmaan_node_search.indexname%' # direkt használjuk ugyanazt, mint a NodeSearch! Különben nem találja a normál keresés.
+            - '%kunstmaan_node_search.indextype%' # direkt használjuk ugyanazt, mint a NodeSearch! Különben nem találja a normál keresés.
+            - '@kunstmaan_search.search'
+            - '@kunstmaan_admin.domain_configuration'
+            - '%analyzer_languages%'
+            - '@doctrine'
+            - '@event_dispatcher'
+        tags:
+            - { name: kunstmaan_search.search_configuration, alias: Entity }
+
+    webtown_kunstmaan_extension.search.twig.extension:
+        class: Webtown\KunstmaanExtensionBundle\Twig\Extension\SearchTwigExtension
+        arguments:
+            - "@twig.extension.routing"
+        tags:
+            - { name: twig.extension }
