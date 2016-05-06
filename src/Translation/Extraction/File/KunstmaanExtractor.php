@@ -163,6 +163,36 @@ class KunstmaanExtractor extends DefaultPhpFileExtractor
             }
         }
 
+        /**
+         * A getPossibleChildTypes() függvény válaszából gyűjti ki a Page neveket. Eg:
+         * <code>
+         *      public function getSearchType()
+         *      {
+         *          return 'search_product';
+         *      }
+         * </code>
+         */
+        if ($node instanceof Node\Stmt\ClassMethod
+            && is_string($node->name)
+            && $node->name == 'getSearchType'
+            // Interface esetén ez üres.
+            && $node->getStmts()
+        ) {
+            foreach ($node->getStmts() as $stmt) {
+                if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Node\Scalar\String_) {
+                    $id = $stmt->expr->value;
+                    $domain = self::DOMAIN;
+
+                    $message = new Message($id, $domain);
+                    $message->setDesc($desc);
+                    $message->setMeaning($meaning);
+                    $message->addSource(new FileSource((string) $this->file, $stmt->getLine()));
+
+                    $this->catalogue->add($message);
+                }
+            }
+        }
+
         return;
     }
 
