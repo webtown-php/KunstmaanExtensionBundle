@@ -6,12 +6,14 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Kunstmaan\NodeBundle\Entity\AbstractPage;
 use Kunstmaan\NodeBundle\Entity\Node;
+use Kunstmaan\PagePartBundle\PagePartConfigurationReader\PagePartConfigurationReaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Webtown\KunstmaanExtensionBundle\Entity\InsertablePageInterface;
 use Webtown\KunstmaanExtensionBundle\Entity\PageParts\InsertPagePagePart;
 
 /**
@@ -33,15 +35,22 @@ class InsertPagePagePartAdminType extends \Symfony\Component\Form\AbstractType
     protected $doctrine;
 
     /**
+     * @var PagePartConfigurationReaderInterface
+     */
+    protected $pagePartConfigReader;
+
+    /**
      * InsertPagePagePartAdminType constructor.
      *
-     * @param RequestStack $requestStack
-     * @param Registry     $doctrine
+     * @param RequestStack                          $requestStack
+     * @param Registry                              $doctrine
+     * @param PagePartConfigurationReaderInterface  $pagePartConfigReader
      */
-    public function __construct(RequestStack $requestStack, Registry $doctrine)
+    public function __construct(RequestStack $requestStack, Registry $doctrine, PagePartConfigurationReaderInterface $pagePartConfigReader)
     {
         $this->requestStack = $requestStack;
         $this->doctrine = $doctrine;
+        $this->pagePartConfigReader = $pagePartConfigReader;
     }
 
     /**
@@ -70,7 +79,7 @@ class InsertPagePagePartAdminType extends \Symfony\Component\Form\AbstractType
             'required' => true,
             'property' => function (Node $choice) use ($locale, $em) {
                 /** @var AbstractPage $page */
-                $page = $choice->getNodeTranslation($locale)->getRef($em);
+                $page = $choice->getNodeTranslation($locale, true)->getRef($em);
 
                 return str_repeat('-', $choice->getLevel() * 2) . ' ' . $page->getPageTitle();
             },
@@ -89,24 +98,71 @@ class InsertPagePagePartAdminType extends \Symfony\Component\Form\AbstractType
     {
         $data = $form->getData();
         if ($data instanceof InsertPagePagePart) {
-            if ($data->getNode()) {
-                /** @var Node $parent */
-                $parent = $data->getNode()->getParent();
-                $parentPageId        = $parent ? $parent->getSequenceNumber() : null;
-                $parentPageClassName = $parent ? $parent->getRefEntityName() : null;
-            } else {
-                // We want to set disable the parent page to prevent infinity insert cycle. If it is a new page part, we can get this data from URL.
-                $parentPageId        = $this->requestStack->getMasterRequest()->get('pageid');
-                $parentPageClassName = $this->requestStack->getMasterRequest()->get('pageclassname');
-            }
 
+            $this->validateParentPage();
+
+            $reflections = [];
             $nodeFormView = $view->children['node'];
             /** @var ChoiceView $choice */
             foreach ($nodeFormView->vars['choices'] as $choice) {
                 /** @var Node $currentData */
                 $currentData = $choice->data;
-                if ($currentData->getRefEntityName() == $parentPageClassName && $currentData->getSequenceNumber() == $parentPageId) {
+
+                $entityCls = $currentData->getRefEntityName();
+                if (!array_key_exists($entityCls, $reflections)) {
+                    $reflections[$entityCls] = new \ReflectionClass($entityCls);
+                }
+
+                // only the pages with the right interface are selectable
+                if (!$reflections[$entityCls]->implementsInterface(InsertablePageInterface::class)) {
                     $choice->attr['disabled'] = 'disabled';
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if the page part is insertable into the current page.
+     *
+     * @throws \LogicException
+     */
+    protected function validateParentPage()
+    {
+        $request = $this->requestStack->getMasterRequest();
+
+        // the node which the pagepart belongs to
+        if ($request->query->has('pageid') && $request->query->has('pageclassname')) {
+            $repo = $this->doctrine->getManager()->getRepository('KunstmaanNodeBundle:Node');
+            $node = $repo->getNodeForIdAndEntityname(
+              $request->query->get('pageid'),
+              $request->query->get('pageclassname')
+            );
+
+            $pageReflection = new \ReflectionClass($node->getRefEntityName());
+
+            // if the current page implements the interface, then it is forbidden to insert anything beneath
+            if ($pageReflection->implementsInterface(InsertablePageInterface::class)) {
+                $currentContext = $this->requestStack->getMasterRequest()->get('context');
+                $page = $pageReflection->newInstanceWithoutConstructor();
+
+                // get pagepart configurations for the current page
+                $pagePartConfigs = $this->pagePartConfigReader->getPagePartAdminConfigurators($page);
+
+                foreach ($pagePartConfigs as $config) {
+                    if ($config->getContext() === $currentContext) {
+                        foreach ($config->getPossiblePagePartTypes() as $pagePartType) {
+                            if ($pagePartType['class'] === InsertPagePagePart::class) {
+                                throw new \LogicException(
+                                  sprintf(
+                                    'The %s page must not allow %s as possible page part, because it implements %s! You must modify the "%s" context.',
+                                    $pageReflection->getName(),
+                                    InsertPagePagePart::class,
+                                    InsertablePageInterface::class,
+                                    $currentContext
+                                  ));
+                            }
+                        }
+                    }
                 }
             }
         }
