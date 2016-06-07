@@ -1,0 +1,11 @@
+kuma_admin:
+    settings:
+        cache:
+            menu_label:     Cache törlése
+    cache:
+        flash:
+            cache_purged:   A cache sikeresen törölve!
+            'cache_not_purged.%exception%': 'A cache törlése nem sikerült: `%exception%`'
+        'info.raw':         Cache törlése kézzel
+        clear:
+            label:          Törlés
