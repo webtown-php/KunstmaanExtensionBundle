@@ -16,6 +16,7 @@ services:
         arguments:
             - "@request_stack"
             - "@doctrine"
+            - "@kunstmaan_page_part.page_part_configuration_reader"
         tags:
             - { name: form.type, alias: page_insert_page_part_type }
 
