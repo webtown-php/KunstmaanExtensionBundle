@@ -9,3 +9,32 @@ kuma_admin:
         'info.raw':         Clear the cache by hand
         clear:
             label:          Clear
+
+wt_kuma_extension:
+    slider:
+        link:
+            more:       More
+        form:
+            image:
+                label:  Image
+            images:
+                label:  Images
+            caption_title:
+                label:  Caption title
+            caption:
+                label:  Caption
+            alt_text:
+                label:  Alternative text
+            link:
+                label:  Link
+            open_in_new_window:
+                label:  Open in new window
+    gallery:
+        form:
+            folder:
+                label:          Folder of images
+                empty_value:    Select folder
+    insert_page:
+        form:
+            label:
+                inserted_node:  Inserted page
