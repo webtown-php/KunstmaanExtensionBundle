@@ -1,0 +1,11 @@
+kuma_admin:
+    settings:
+        cache:
+            menu_label:     Clear cache
+    cache:
+        flash:
+            cache_purged:   Cache has been purged!
+            'cache_not_purged.%exception%': 'Cache not purged: `%exception%`'
+        'info.raw':         Clear the cache by hand
+        clear:
+            label:          Clear
