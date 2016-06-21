@@ -24,6 +24,11 @@ class CacheController extends Controller
     {
         try {
             $this->get('webtown_kunstmaan_extension.cache_manager')->forcePurgeAll();
+            if (defined('apc_clear_cache')) {
+                apc_clear_cache();
+                apc_clear_cache('user');
+                apc_clear_cache('opcode');
+            }
             $this->addFlash('success', $this->get('translator')->trans('kuma_admin.cache.flash.cache_purged'));
         } catch (\Exception $e) {
             $this->addFlash('error', $this->get('translator')->trans(
