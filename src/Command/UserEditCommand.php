@@ -100,7 +100,8 @@ class UserEditCommand extends ContainerAwareCommand
      */
     protected function selector(&$choices = null)
     {
-        $choices = $this->userEditor->getChoicesAsEmailUsername($choices ? $choices : $this->choices);
+        $choices = $choices ? $choices : $this->choices;
+        $choices = $this->userEditor->getChoicesAsEmailUsername($choices);
         $question = new ChoiceQuestion(static::PLEASE_SELECT_A_USER, $choices);
         $selectedUser = $this->ask($question);
         $user = $this->getChoiceBySelection($selectedUser);
@@ -115,13 +116,13 @@ class UserEditCommand extends ContainerAwareCommand
     protected function autocomplete()
     {
         $question = new Question(static::PLEASE_SELECT_A_USER);
-        $question->setAutocompleterValues($this->choices);
+        $question->setAutocompleterValues($this->userEditor->getChoicesAsSeparateEmailUsername($this->choices));
         $selectedUser = $this->ask($question);
         // nem választott usert, vége
         if ('' === $selectedUser) {
             return;
         }
-        $user = $this->getChoiceByUsername($selectedUser);
+        $user = $this->getChoiceByUsernameOrEmail($selectedUser);
         // kiválasztott egy usert
         if (!is_null($user)) {
             $this->editor($user);
@@ -225,16 +226,19 @@ EOL;
     }
 
     /**
-     * Find User by username
+     * Find User by username or email
      *
      * @param string $username
      *
      * @return User
      */
-    protected function getChoiceByUsername($username)
+    protected function getChoiceByUsernameOrEmail($selection)
     {
         foreach ($this->choices as $item) {
-            if ($item->getUsername() === $username) {
+            if ($item->getUsername() === $selection) {
+                return $item;
+            }
+            if ($item->getEmail() === $selection) {
                 return $item;
             }
         }
@@ -264,7 +268,7 @@ EOL;
     protected function getNewValues(User $user)
     {
         $newProps = new UserUpdater();
-        $this->logger->section('Editing user' . $user->getUsername() . ' (' . $user->getEmail() . ')');
+        $this->logger->section('Editing user ' . $user->getEmail() . ' (' . $user->getUsername() . ')');
         $this->logger->comment('leave empty to keep unchanged');
         $newProps->setUsername($this->ask(new Question('Username', $user->getUsername())));
         $newProps->setEmail($this->ask(new Question('E-mail address', $user->getEmail())));

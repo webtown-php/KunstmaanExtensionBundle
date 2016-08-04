@@ -59,8 +59,8 @@ class UserEditService
      *
      * @param string $username
      * @param string $email
-     * @param bool   $or       combine search params with OR
-     * @param int    $limit    Limit the number of results
+     * @param bool   $or    combine search params with OR
+     * @param int    $limit Limit the number of results
      *
      * @return array
      */
@@ -85,6 +85,8 @@ class UserEditService
     }
 
     /**
+     * Get selector choices as combined username+email
+     *
      * @param User[] $choices
      *
      * @return string[]
@@ -94,6 +96,24 @@ class UserEditService
         $ret = [];
         foreach ($choices as $item) {
             $ret[] = sprintf('%s (%s)', $item->getEmail(), $item->getUsername());
+        }
+
+        return $ret;
+    }
+
+    /**
+     * User choices is separate usernames/email for autocomplete
+     *
+     * @param User[] $choices
+     *
+     * @return string[]
+     */
+    public function getChoicesAsSeparateEmailUsername(array &$choices)
+    {
+        $ret = [];
+        foreach ($choices as $item) {
+            $ret[] = $item->getEmail();
+            $ret[] = $item->getUsername();
         }
 
         return $ret;
