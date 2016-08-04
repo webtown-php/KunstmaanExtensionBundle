@@ -100,9 +100,10 @@ class UserEditCommand extends ContainerAwareCommand
      */
     protected function selector(&$choices = null)
     {
-        $question = new ChoiceQuestion(static::PLEASE_SELECT_A_USER, $choices ? $choices : $this->choices);
+        $choices = $this->userEditor->getChoicesAsEmailUsername($choices ? $choices : $this->choices);
+        $question = new ChoiceQuestion(static::PLEASE_SELECT_A_USER, $choices);
         $selectedUser = $this->ask($question);
-        $user = $this->getChoiceByUsername($selectedUser);
+        $user = $this->getChoiceBySelection($selectedUser);
         if ($user) {
             $this->editor($user);
         }
@@ -198,6 +199,29 @@ EOL;
                 'text/html'
             );
         $this->getContainer()->get('mailer')->send($message);
+    }
+
+    /**
+     * Find User by username
+     *
+     * @param string $username
+     *
+     * @return User
+     */
+    protected function getChoiceBySelection($selection)
+    {
+        preg_match('/^[^(]+\(([^\)]+)\)$/', $selection, $matches);
+        if (count($matches) < 2) {
+            return;
+        }
+        $username = $matches[1];
+        foreach ($this->choices as $item) {
+            if ($item->getUsername() === $username) {
+                return $item;
+            }
+        }
+
+        return;
     }
 
     /**

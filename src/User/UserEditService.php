@@ -85,6 +85,21 @@ class UserEditService
     }
 
     /**
+     * @param User[] $choices
+     *
+     * @return string[]
+     */
+    public function getChoicesAsEmailUsername(array &$choices)
+    {
+        $ret = [];
+        foreach ($choices as $item) {
+            $ret[] = sprintf('%s (%s)', $item->getEmail(), $item->getUsername());
+        }
+
+        return $ret;
+    }
+
+    /**
      * Update user details
      *
      * @param User        $user
