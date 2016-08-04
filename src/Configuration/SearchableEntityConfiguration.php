@@ -176,7 +176,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         $this->documents[] = $this->searchProvider->createDocument(
             $uid,
             $doc,
-            $this->indexName,
+            $this->indexName . '_' . $locale,
             $this->indexType . '_' . $locale
         );
     }
