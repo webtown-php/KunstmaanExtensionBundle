@@ -8,10 +8,10 @@ use Kunstmaan\NodeBundle\Entity\AbstractPage;
 use Kunstmaan\NodeBundle\Entity\NodeTranslation;
 use Kunstmaan\PagePartBundle\Helper\HasPagePartsInterface;
 use Kunstmaan\PagePartBundle\Twig\Extension\PagePartTwigExtension;
+use Webtown\KunstmaanExtensionBundle\Entity\InsertablePageInterface;
 use Webtown\KunstmaanExtensionBundle\Entity\PageParts\InsertPagePagePart;
 use Webtown\KunstmaanExtensionBundle\Exception\InsertedMaxDepthException;
 
-// @todo (Chris) A következő módosításokat kell végrehajtani: 1. Legyen egy erre létrehozott külön Page típus. 2. Az adott Page típusba ne lehessen beszúrni más oldalt.
 class PageInsertTwigExtension extends \Twig_Extension
 {
     /**
@@ -51,10 +51,15 @@ class PageInsertTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('render_inserted_pageparts', [$this, 'renderInsertedPageParts'], [
+            new \Twig_SimpleFunction('render_deep_inserted_pageparts', [$this, 'renderDeepInsertedPageParts'], [
                 'needs_environment' => true,
                 'needs_context' => true,
                 'is_safe' => ['html']
+            ]),
+            new \Twig_SimpleFunction('render_inserted_pageparts', [$this, 'renderInsertedPageParts'], [
+              'needs_environment' => true,
+              'needs_context' => true,
+              'is_safe' => ['html'],
             ]),
             new \Twig_SimpleFunction('get_page_from_insert_page_page_part', [$this, 'getPageFromInsertPagePagePart']),
             new \Twig_SimpleFunction('get_page_by_internal_name', [$this, 'getPageByInternalName']),
@@ -62,6 +67,29 @@ class PageInsertTwigExtension extends \Twig_Extension
     }
 
     public function renderInsertedPageParts(
+      \Twig_Environment $env,
+      array $twigContext,
+      InsertPagePagePart $insertPagePagePart,
+      $locale,
+      $includeOffline = true,
+      $contextName = 'main',
+      array $parameters = []
+    ) {
+        /** @var HasPagePartsInterface|AbstractPage $page */
+        $page = $this->getPageFromInsertPagePagePart($insertPagePagePart, $locale, $includeOffline);
+        if (!$page instanceof InsertablePageInterface) {
+            throw new \InvalidArgumentException(sprintf('Only pages which implement %s interface can be inserted as page part!',
+                InsertablePageInterface::class
+            ));
+        }
+
+        $twigContext['page'] = $page;
+        unset($twigContext['pageparts']);
+
+        return $this->pagePartTwigExtension->renderPageParts($env, $twigContext, $page, $contextName, $parameters);
+    }
+
+    public function renderDeepInsertedPageParts(
         \Twig_Environment $env,
         array $twigContext,
         InsertPagePagePart $insertPagePagePart,
@@ -125,6 +153,6 @@ class PageInsertTwigExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'page_insert';
+        return 'wt_kuma_extension.page_insert';
     }
 }

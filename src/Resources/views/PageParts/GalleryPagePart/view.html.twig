@@ -1,9 +1,11 @@
 {%  for media in resource.getMedia %}
     <div class="gallery-box">
         {% set imgUrl = media.url %}
-        <a href="{{ imgUrl }}" rel="gallery-{{ resource.id }}" title="{{ media.name }}" class="fancybox">
-            <img src="{{ imgUrl | imagine_filter('image_small_jpg') }}" />
-        </a>
+        {% if imgUrl and media.contentType starts with 'image' %}
+            <a href="{{ imgUrl }}" rel="gallery-{{ resource.id }}" title="{{ media.name }}" class="fancybox">
+                <img src="{{ imgUrl | imagine_filter('image_small_jpg') }}" />
+            </a>
+        {% endif %}
     </div>
 {% endfor %}
 <div class="gallery-clearfix"></div>
