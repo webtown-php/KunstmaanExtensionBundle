@@ -11,14 +11,14 @@ services:
         tags:
             - { name: twig.extension }
 
-#    webtown_kunstmaan_extension.page_insert.admin_form_type:
-#        class: Webtown\KunstmaanExtensionBundle\Form\PageParts\InsertPagePagePartAdminType
-#        arguments:
-#            - "@request_stack"
-#            - "@doctrine"
-#            - "@kunstmaan_page_part.page_part_configuration_reader"
-#        tags:
-#            - { name: form.type, alias: page_insert_page_part_type }
+    webtown_kunstmaan_extension.page_insert.admin_form_type:
+        class: Webtown\KunstmaanExtensionBundle\Form\PageParts\InsertPagePagePartAdminType
+        arguments:
+            - "@request_stack"
+            - "@doctrine"
+            - "@kunstmaan_page_part.page_part_configuration_reader"
+        tags:
+            - { name: form.type, alias: page_insert_page_part_type }
 
     webtown_kunstmaan_extension.translation.kunstmaan_extractor:
         class: Webtown\KunstmaanExtensionBundle\Translation\Extraction\File\KunstmaanExtractor
