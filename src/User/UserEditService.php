@@ -12,6 +12,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Kunstmaan\AdminBundle\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
+/**
+ * UserEditCommand db services
+ *
+ * @author Zoltan Feher <whitezo@webtown.hu>
+ */
 class UserEditService
 {
     /**
@@ -24,7 +29,8 @@ class UserEditService
     private $encoder;
 
     /**
-     * @param Registry $registry
+     * @param Registry            $registry
+     * @param UserPasswordEncoder $encoder
      */
     public function __construct(Registry $registry, UserPasswordEncoder $encoder)
     {
@@ -49,33 +55,11 @@ class UserEditService
     }
 
     /**
-     * @param $username
-     * @param $email
-     *
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public function getUsernameEmailQuery($username = null, $email = null)
-    {
-        $qb = $this->getRepository()->createQueryBuilder('u');
-
-        if ($username) {
-            $qb->where('u.username = :username');
-            $qb->setParameter('username', $username);
-        }
-        if ($email) {
-            $qb->andWhere('u.email = :email');
-            $qb->setParameter('email', $email);
-        }
-
-        return $qb;
-    }
-
-    /**
      * Find user choices
      *
      * @param string $username
      * @param string $email
-     * @param bool   $or
+     * @param bool   $or       combine search params with OR
      * @param int    $limit    Limit the number of results
      *
      * @return array
@@ -103,30 +87,19 @@ class UserEditService
     /**
      * Update user details
      *
-     * @param User   $user
-     * @param string $username
-     * @param string $email
-     * @param string $password
+     * @param User        $user
+     * @param UserUpdater $up
      */
-    public function updateUser(User $user, $username, $email, $password)
+    public function updateUser(User $user, UserUpdater $up)
     {
-        if ($username) {
-            $user->setUsername($username);
-        }
-        if ($email) {
-            $user->setEmail($email);
-        }
-        if ($password) {
-            $password = $this->getEncoder()->encodePassword($user, $password);
-            $user->setPassword($password);
-        }
+        $up->updateUser($user, $this->getEncoder());
         $em = $this->getRegistry()->getManager();
         $em->persist($user);
         $em->flush();
     }
 
     /**
-     * @return \Doctrine\Common\Persistence\ObjectRepository|\Kunstmaan\AdminBundle\Repository\UserRepository
+     * @return \Kunstmaan\AdminBundle\Repository\UserRepository
      */
     protected function getRepository()
     {

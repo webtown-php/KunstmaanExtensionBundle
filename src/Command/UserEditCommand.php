@@ -12,9 +12,15 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Webtown\KunstmaanExtensionBundle\User\UserEditService;
+use Webtown\KunstmaanExtensionBundle\User\UserUpdater;
 
 class UserEditCommand extends ContainerAwareCommand
 {
+    /**
+     * User select question
+     *
+     * @var string
+     */
     const PLEASE_SELECT_A_USER = 'Please select a user';
     /**
      * @var UserEditService
@@ -63,12 +69,11 @@ class UserEditCommand extends ContainerAwareCommand
         $this->logger = new SymfonyStyle($input, $output);
         $this->input = $input;
         $this->output = $output;
-        // user manager service
         $this->userEditor = $this->getContainer()->get('webtown_kunstmaan_extension.user_edit');
 
         $this->logger->title('User updater');
 
-        // find by options or find all
+        // find by options or find all users
         $this->choices = $this->userEditor->getChoices($input->getOption('username'), $input->getOption('email'));
         $this->selectionHandler();
     }
@@ -130,51 +135,74 @@ class UserEditCommand extends ContainerAwareCommand
      * Show user editor
      *
      * @param User $user
-     *
-     * @internal param string $username
      */
     protected function editor(User $user)
     {
-        $this->logger->section('Editing user' . $user->getUsername() . ' (' . $user->getEmail() . ')');
-        $this->logger->comment('leave empty to keep unchanged');
-        $username = $this->ask(new Question('Username', $user->getUsername()));
-        $email = $this->ask(new Question('E-mail address', $user->getEmail()));
-        $password = $this->ask(new Question('Password', '***'));
-        $password = $password !== '***' ? $password : '';
+        // store props
+        $oldProps = new UserUpdater($user);
+        $newProps = $this->getNewValues($user);
+
         // confirm
         $ln = <<<EOL
 Summary
 -------
-Username: "$username"
-Email:    "$email"
-Password: "$password"
+Username: "{$newProps->getUsername()}"
+Email:    "{$newProps->getEmail()}"
+Password: "{$newProps->getPassword()}"
 EOL;
         $this->logger->block($ln);
-        $changed =
-            $username != $user->getUsername() ||
-            $email != $user->getEmail() ||
-            $password != '';
-        if (!$changed) {
+
+        // check changes
+        $changedValues = $oldProps->getChanged($newProps);
+        if (empty($changedValues)) {
             $this->logger->note('Nothing changed, exiting.');
 
             return;
         }
         // persist
-        if ($this->ask(new ConfirmationQuestion('Confirm user update?'))) {
-            $this->userEditor->updateUser($user, $username, $email, $password);
+        if ($persist = $this->ask(new ConfirmationQuestion('Confirm user update?'))) {
+            $this->userEditor->updateUser($user, $newProps);
             $this->logger->success('User updated!');
+        }
+        // send mail
+        if ($persist) {
+            $dontSend = 'Don\'t send';
+            $emailChoices = [$dontSend, $oldProps->getEmail()];
+            if (isset($changedValues['email'])) {
+                $emailChoices[] = $changedValues['email'];
+            }
+            $to = $this->ask(new ChoiceQuestion('Send notification to', $emailChoices));
+            if ($to !== $dontSend) {
+                $this->sendNotification($to, $changedValues);
+            }
         }
     }
 
     /**
-     * @return mixed
+     * Send email notification about changes
+     *
+     * @param       $to
+     * @param array $changedValues
      */
-    protected function getQuestionHelper()
+    protected function sendNotification($to, array $changedValues)
     {
-        return $this->getHelper('question');
+        $message = \Swift_Message::newInstance()
+            ->setSubject('User details updated')
+            ->setFrom($this->getContainer()->getParameter('fos_user.resetting.email.from_email'))
+            ->setTo($to)
+            ->setBody(
+                $this->getContainer()->get('twig')->render(
+                    '@WebtownKunstmaanExtension/email/user_edit.html.twig',
+                    ['changes' => $changedValues]
+                ),
+                'text/html'
+            );
+        $this->getContainer()->get('mailer')->send($message);
     }
 
     /**
+     * Find User by username
+     *
      * @param string $username
      *
      * @return User
@@ -187,10 +215,12 @@ EOL;
             }
         }
 
-        return null;
+        return;
     }
 
     /**
+     * Ask question
+     *
      * @param Question $question
      *
      * @return string
@@ -198,5 +228,26 @@ EOL;
     protected function ask(Question $question)
     {
         return $this->logger->askQuestion($question);
+    }
+
+    /**
+     * Ask for new user properties
+     *
+     * @param User $user
+     *
+     * @return UserUpdater
+     */
+    protected function getNewValues(User $user)
+    {
+        $newProps = new UserUpdater();
+        $this->logger->section('Editing user' . $user->getUsername() . ' (' . $user->getEmail() . ')');
+        $this->logger->comment('leave empty to keep unchanged');
+        $newProps->setUsername($this->ask(new Question('Username', $user->getUsername())));
+        $newProps->setEmail($this->ask(new Question('E-mail address', $user->getEmail())));
+        $password = $this->ask(new Question('Password', '***'));
+        // replace default *** value if empty is given
+        $newProps->setPassword($password !== '***' ? $password : '');
+
+        return $newProps;
     }
 }
