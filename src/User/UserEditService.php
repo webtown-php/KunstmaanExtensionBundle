@@ -59,8 +59,8 @@ class UserEditService
      *
      * @param string $username
      * @param string $email
-     * @param bool   $or    combine search params with OR
-     * @param int    $limit Limit the number of results
+     * @param bool   $or       combine search params with OR
+     * @param int    $limit    Limit the number of results
      *
      * @return array
      */
