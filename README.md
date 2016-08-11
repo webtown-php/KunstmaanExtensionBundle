@@ -51,6 +51,18 @@ class AppKernel extends Kernel
 }
 ```
 
+Step 3: Add the route
+---------------------
+
+Add the route to `app/config/routing.yml`:
+
+```yml
+#KunstmaanExtensionBundle
+KunstmaanExtensionBundle:
+    resource: "@WebtownKunstmaanExtensionBundle/Resources/config/routing.yml"
+    prefix:   /
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
