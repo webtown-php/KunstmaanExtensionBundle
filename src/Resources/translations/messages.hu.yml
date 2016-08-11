@@ -38,3 +38,8 @@ wt_kuma_extension:
         form:
             label:
                 inserted_node:  Beszurandó oldal
+user_edit:
+    property:
+        username: Felhasználónév
+        email: E-mail cím
+        password: Jelszó

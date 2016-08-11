@@ -38,3 +38,8 @@ wt_kuma_extension:
         form:
             label:
                 inserted_node:  Inserted page
+user_edit:
+    property:
+        username: Username
+        email: E-mail address
+        password: Password

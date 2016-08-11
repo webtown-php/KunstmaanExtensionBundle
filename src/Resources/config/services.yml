@@ -88,3 +88,9 @@ services:
             - "@twig.extension.routing"
         tags:
             - { name: twig.extension }
+
+    webtown_kunstmaan_extension.user_edit:
+        class: Webtown\KunstmaanExtensionBundle\User\UserEditService
+        arguments:
+          - "@doctrine"
+          - "@security.password_encoder"
