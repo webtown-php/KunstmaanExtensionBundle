@@ -18,9 +18,9 @@ use Kunstmaan\SearchBundle\Search\Search;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Webtown\KunstmaanExtensionBundle\Configuration\SearchableEntityConfiguration;
 use Webtown\KunstmaanExtensionBundle\Event\IndexEntityEvent;
+use Webtown\KunstmaanExtensionBundle\Test\Traits\PhpUnitTrait;
 use Webtown\KunstmaanExtensionBundle\Tests\Entity\OtherSearchableEntity;
 use Webtown\KunstmaanExtensionBundle\Tests\Entity\SearchableEntity;
-use Webtown\KunstmaanExtensionBundle\Tests\Traits\PhpUnitTrait;
 use Mockery as m;
 
 
@@ -334,6 +334,13 @@ class SearchableEntityConfigurationTest extends \PHPUnit_Framework_TestCase
         ;
     }
 
+    /**
+     * @param array $backendLocales
+     * @param null $elasticaProviderBehavior
+     * @param null $emBehavior
+     * @param null $eventDispatcherBehavior
+     * @return SearchableEntityConfiguration
+     */
     protected function buildConfigurationObject(
         $backendLocales = ['en', 'hu'],
         $elasticaProviderBehavior = null,

@@ -6,7 +6,7 @@
  * Time: 11:55
  */
 
-namespace Webtown\KunstmaanExtensionBundle\Tests\Traits;
+namespace Webtown\KunstmaanExtensionBundle\Test\Traits;
 
 trait PhpUnitTrait
 {

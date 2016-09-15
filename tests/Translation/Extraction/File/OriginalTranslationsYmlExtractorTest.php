@@ -10,7 +10,7 @@ namespace Webtown\KunstmaanExtensionBundle\Tests\Translation\Extraction\File;
 
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Model\MessageCatalogue;
-use Webtown\KunstmaanExtensionBundle\Tests\Traits\PhpUnitTrait;
+use Webtown\KunstmaanExtensionBundle\Test\Traits\PhpUnitTrait;
 use Webtown\KunstmaanExtensionBundle\Translation\Extraction\File\OriginalTranslationsYmlExtractor;
 
 class OriginalTranslationsYmlExtractorTest extends \PHPUnit_Framework_TestCase
