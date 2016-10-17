@@ -46,4 +46,9 @@ trait PhpUnitTrait
             $this->assertObjectProtectedAttribute($entity, $key, $value);
         }
     }
+
+    protected function cloneObject($object)
+    {
+        return unserialize(serialize($object));
+    }
 }
