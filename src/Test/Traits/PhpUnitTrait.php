@@ -10,7 +10,6 @@ namespace Webtown\KunstmaanExtensionBundle\Test\Traits;
 
 trait PhpUnitTrait
 {
-    // @todo (Chris) Az alábbiakat inkább a PHPUnitTrait-ből betölteni, ha már külön bundle lett a WebtownTestingBundle
     protected function callObjectProtectedMethod($object, $methodName, $args = [])
     {
         $reflMethod = new \ReflectionMethod(get_class($object), $methodName);
