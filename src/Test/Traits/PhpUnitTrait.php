@@ -46,6 +46,13 @@ trait PhpUnitTrait
         }
     }
 
+    /**
+     * The PHP clone don't make real clone. The object's object will reference instead of clone. Use the
+     * `$this->cloneObject($object)` to make real clone.
+     *
+     * @param $object
+     * @return mixed
+     */
     protected function cloneObject($object)
     {
         return unserialize(serialize($object));
