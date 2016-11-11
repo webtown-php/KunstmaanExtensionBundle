@@ -9,7 +9,7 @@
 namespace Webtown\KunstmaanExtensionBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Webtown\KunstmaanExtensionBundle\Entity\SearchableEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

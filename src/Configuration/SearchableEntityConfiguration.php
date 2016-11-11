@@ -11,6 +11,8 @@ namespace Webtown\KunstmaanExtensionBundle\Configuration;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Elastica\Document;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Webtown\KunstmaanExtensionBundle\Entity\SearchableEntityInterface;
 use Webtown\KunstmaanExtensionBundle\Event\IndexEntityEvent;
@@ -41,6 +43,9 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
     /** @var Registry */
     protected $doctrine;
 
+    /** @var  ManagerRegistry */
+    protected $mongo;
+
     /** @var  EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -57,6 +62,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
      * @param DomainConfigurationInterface $domainConfiguration
      * @param $analyzerLanguages
      * @param Registry $doctrine
+     * @param ManagerRegistry $mongo
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -66,6 +72,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         DomainConfigurationInterface $domainConfiguration,
         $analyzerLanguages,
         Registry $doctrine,
+        ManagerRegistry $mongo,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->indexName           = $name;
@@ -74,6 +81,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         $this->locales             = $domainConfiguration->getBackendLocales();
         $this->analyzerLanguages   = $analyzerLanguages;
         $this->doctrine            = $doctrine;
+        $this->mongo               = $mongo;
         $this->eventDispatcher     = $eventDispatcher;
     }
 
@@ -90,12 +98,26 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
      */
     public function populateIndex()
     {
-        $em = $this->doctrine->getManager();
-        $meta = $em->getMetadataFactory()->getAllMetadata();
+        $this->buildDocumentsByManager($this->doctrine);
+
+        if ($this->mongo) {
+            $this->buildDocumentsByManager($this->mongo);
+        }
+
+        if (!empty($this->documents)) {
+            $response = $this->searchProvider->addDocuments($this->documents);
+            $this->documents = [];
+        }
+    }
+
+    protected function buildDocumentsByManager(ManagerRegistry $registry)
+    {
+        $manager = $registry->getManager();
+        $meta = $manager->getMetadataFactory()->getAllMetadata();
         /** @var ClassMetadata $m */
         foreach ($meta as $m) {
             if ($m->getReflectionClass()->implementsInterface(SearchableEntityInterface::class)) {
-                $repository = $em->getRepository($m->getName());
+                $repository = $manager->getRepository($m->getName());
                 $entities = $repository->findAll();
                 foreach ($entities as $entity) {
                     foreach ($this->locales as $locale) {
@@ -103,11 +125,6 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
                     }
                 }
             }
-        }
-
-        if (!empty($this->documents)) {
-            $response = $this->searchProvider->addDocuments($this->documents);
-            $this->documents = [];
         }
     }
 
