@@ -162,7 +162,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
     {
         foreach ($this->locales as $locale) {
             $uid       = $this->getDocUid($entity, $locale);
-            $indexType = $this->indexType . '_' . $locale;
+            $indexType = $this->indexType;
             $this->searchProvider->deleteDocument($this->indexName, $indexType, $uid);
         }
     }
@@ -181,6 +181,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
             'entity'              => ClassLookup::getClass($entity),
             'view_roles'          => ['IS_AUTHENTICATED_ANONYMOUSLY'],
             'content'             => $this->removeHtml($entity->getSearchContent($locale)),
+            'type'                => $entity->getSearchType(),
         ];
 
         // Analyzer field
@@ -194,7 +195,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
             $uid,
             $doc,
             $this->indexName . '_' . $locale,
-            $this->indexType . '_' . $locale
+            $this->indexType
         );
     }
 
