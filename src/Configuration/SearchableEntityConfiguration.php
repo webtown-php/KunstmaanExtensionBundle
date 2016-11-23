@@ -182,6 +182,7 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
             'view_roles'          => ['IS_AUTHENTICATED_ANONYMOUSLY'],
             'content'             => $this->removeHtml($entity->getSearchContent($locale)),
             'type'                => $entity->getSearchType(),
+            'id'                  => $entity->getId(),
         ];
 
         // Analyzer field
