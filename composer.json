@@ -21,7 +21,7 @@
     "require": {
         "php" : "~5.5|~7.0",
         "symfony/symfony": "~3.2",
-        "kunstmaan/bundles-cms": "4.0.0@dev",
+        "kunstmaan/bundles-cms": "~4.0.0@dev",
         "friendsofsymfony/user-bundle": "2.0.*@dev",
         "fchris82/jms-translation-bundle-fork": "~1.2.2"
     },
