@@ -62,8 +62,8 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
      * @param DomainConfigurationInterface $domainConfiguration
      * @param $analyzerLanguages
      * @param Registry $doctrine
-     * @param ManagerRegistry $mongo
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ManagerRegistry $mongo
      */
     public function __construct(
         $name,
@@ -72,8 +72,8 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         DomainConfigurationInterface $domainConfiguration,
         $analyzerLanguages,
         Registry $doctrine,
-        ManagerRegistry $mongo,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ManagerRegistry $mongo = null
     ) {
         $this->indexName           = $name;
         $this->indexType           = $type;
@@ -81,8 +81,8 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
         $this->locales             = $domainConfiguration->getBackendLocales();
         $this->analyzerLanguages   = $analyzerLanguages;
         $this->doctrine            = $doctrine;
-        $this->mongo               = $mongo;
         $this->eventDispatcher     = $eventDispatcher;
+        $this->mongo               = $mongo;
     }
 
     /**

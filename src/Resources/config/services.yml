@@ -78,8 +78,8 @@ services:
             - '@kunstmaan_admin.domain_configuration'
             - '%analyzer_languages%'
             - '@doctrine'
-            - '@?doctrine_mongodb'
             - '@event_dispatcher'
+            - '@?doctrine_mongodb'
         tags:
             - { name: kunstmaan_search.search_configuration, alias: Entity }
 
