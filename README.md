@@ -42,6 +42,7 @@ class AppKernel extends Kernel
             // ...
 
             new Webtown\KunstmaanExtensionBundle\WebtownKunstmaanExtensionBundle(),
+            new JMS\TranslationBundle\JMSTranslationBundle(),
         );
 
         // ...
