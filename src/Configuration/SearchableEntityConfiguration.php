@@ -12,7 +12,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Elastica\Document;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Kunstmaan\SearchBundle\Helper\IndexableInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Webtown\KunstmaanExtensionBundle\Entity\SearchableEntityInterface;
 use Webtown\KunstmaanExtensionBundle\Event\IndexEntityEvent;
@@ -169,6 +169,10 @@ class SearchableEntityConfiguration implements SearchConfigurationInterface
 
     protected function addEntityToIndex(SearchableEntityInterface $entity, $locale)
     {
+        if ($entity instanceof IndexableInterface && !$entity->isIndexable()) {
+            return;
+        }
+
         $doc = [
 //            'root_id'             => $rootNode->getId(),
 //            'node_id'             => $node->getId(),
